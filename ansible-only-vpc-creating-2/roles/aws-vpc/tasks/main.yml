@@ -1,0 +1,27 @@
+---
+- name: Create a VPC in aws 
+  ec2_vpc_net:
+     name: ansible_vpc
+     cidr_block: 10.0.0.0/16
+     region: us-east-1
+     tags:
+        Name: vpc_from_ansible
+        Env:  dev_vpc
+     tenancy: dedicated
+  register: vpc_create
+
+- name: Print the vpc creating process using debug and var 
+  debug:
+    var: vpc_create
+    verbosity: 0
+
+- name: Print the vpc cidr block
+  debug:
+    var: vpc_create.vpc.cidr_block
+
+- name: print the vpc association_id
+  debug:
+    var: vpc_create.vpc.cidr_block_association_set
+
+
+
