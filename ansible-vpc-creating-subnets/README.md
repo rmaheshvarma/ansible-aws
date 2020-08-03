@@ -2,10 +2,11 @@ Using this ansible script we can create
  1. One VPC
  2. Two Public Subnets
  3. Two Private Subnets
+ 4. Create the IneternetGateway
 
 How to execute this ansible Script
 
-If you are using Linux 
+From Ansible controll machine
 
  $ ansible-playbook site.yml
 

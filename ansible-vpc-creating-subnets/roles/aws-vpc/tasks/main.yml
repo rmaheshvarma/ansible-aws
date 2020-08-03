@@ -70,6 +70,20 @@
         env: test
 
 
+## Creating InterNetGateway and Associated to respective VPC ##
+
+- name: Creating the IGW and Asccociated to respective VPC
+  ec2_vpc_igw:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      region: us-east-1
+      tags:
+        Name: test-ansible-igw
+        env: test
+
+ 
+
+
 
 
 
