@@ -1,0 +1,79 @@
+---
+- name: Create a VPC in aws 
+  ec2_vpc_net:
+     name: ansible_vpc
+     cidr_block: 10.0.0.0/16
+     region: us-east-1
+     tags:
+        Name: testing_from_ansible
+        env:  test
+     tenancy: dedicated
+  register: vpc_create
+
+- name: Print the vpc creating process using debug and var 
+  debug:
+    var: vpc_create
+    verbosity: 0
+
+- name: Print the vpc cidr block
+  debug:
+    var: vpc_create.vpc.cidr_block
+
+- name: Print the VPC id 
+  debug:
+    var: vpc_create.vpc.id
+
+## Creating the public and private subnets with out any variable declaration ## 
+
+- name: Creating the PublicSubnet-1A
+  ec2_vpc_subnet:
+     state: present
+     vpc_id: "{{ vpc_create.vpc.id }}"
+     cidr: 10.0.10.0/24
+     region: us-east-1
+     az: us-east-1a
+     tags:
+       Name: test-ansible-Public-subnet-1A
+       env: test
+
+- name: Creating the Public subnet-1B
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.20.0/24
+      region: us-east-1
+      az: us-east-1b
+      tags:
+        Name: test-ansible-public-subnet-1B
+        env: test
+
+- name: Creating the Private subnet-1A
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.30.0/24
+      region: us-east-1
+      az: us-east-1a
+      tags: 
+       Name: test-ansible-private-subnet-1A
+       env: test
+
+- name: Creating the Private subnet-1B
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.40.0/24
+      region: us-east-1
+      az: us-east-1b
+      tags:
+        Name: test-ansible-private-subnet-1B
+        env: test
+
+
+
+
+
+
+
+
+

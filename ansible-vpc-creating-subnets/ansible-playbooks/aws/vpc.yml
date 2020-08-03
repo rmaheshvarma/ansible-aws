@@ -1,0 +1,12 @@
+---
+- hosts: all
+  tasks:
+     ec2_vpc_net:
+        name: ansible_vpc
+        cidr_block: 10.0.0.0/16
+        region: us-east-1
+     tags:
+        Name: vpc_from_ansible
+        Env:  dev_vpc
+     tenancy: dedicated
+
