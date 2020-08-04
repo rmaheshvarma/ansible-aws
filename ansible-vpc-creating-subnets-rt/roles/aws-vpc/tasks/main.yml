@@ -1,0 +1,137 @@
+---
+- name: Create a VPC in aws 
+  ec2_vpc_net:
+     name: ansible_vpc
+     cidr_block: 10.0.0.0/16
+     region: us-east-1
+     tags:
+        Name: testing_from_ansible
+        env:  test
+     tenancy: dedicated
+  register: vpc_create
+
+- name: Print the vpc creating process using debug and var 
+  debug:
+    var: vpc_create
+    verbosity: 0
+
+- name: Print the vpc cidr block
+  debug:
+    var: vpc_create.vpc.cidr_block
+
+- name: Print the VPC id 
+  debug:
+    var: vpc_create.vpc.id
+
+## Creating the public and private subnets with out any variable declaration ## 
+
+- name: Creating the PublicSubnet-1A
+  ec2_vpc_subnet:
+     state: present
+     vpc_id: "{{ vpc_create.vpc.id }}"
+     cidr: 10.0.10.0/24
+     region: us-east-1
+     az: us-east-1a
+     tags:
+       Name: test-ansible-Public-subnet-1A
+       env: test
+  register: vpc_public_subnet_1a
+
+- name: Creating the Public subnet-1B
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.20.0/24
+      region: us-east-1
+      az: us-east-1b
+      tags:
+        Name: test-ansible-public-subnet-1B
+        env: test
+  register: vpc_public_subnet_1b
+
+- name: Creating the Private subnet-1A
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.30.0/24
+      region: us-east-1
+      az: us-east-1a
+      tags: 
+        Name: test-ansible-private-subnet-1A
+        env: test
+  register: vpc_private_subnet_1a
+
+
+- name: Creating the Private subnet-1B
+  ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      cidr: 10.0.40.0/24
+      region: us-east-1
+      az: us-east-1b
+      tags:
+        Name: test-ansible-private-subnet-1B
+        env: test
+  register: vpc_private_subnet_1b
+
+
+## Creating InterNetGateway and Associated to respective VPC ##
+
+- name: Creating the IGW and Asccociated to respective VPC
+  ec2_vpc_igw:
+      state: present
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      region: us-east-1
+      tags:
+        Name: test-ansible-igw
+        env: test
+  register: test_igw
+
+- name: debug the igw
+  debug:
+    var: test_igw
+
+- name: print the igw id
+  debug:
+    var: test_igw.gateway_id
+
+## Creating Routing public Routing table and attached the Public subnets to it ##
+
+- name: Creating the public Routing table and associtated the public subnets to it.
+  ec2_vpc_route_table:
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      region: us-east-1
+      subnets:
+         - "{{ vpc_public_subnet_1a.subnet.id }}"
+         - "{{ vpc_public_subnet_1b.subnet.id }}"
+      routes:
+         - dest: 0.0.0.0/0
+           gateway_id: "{{ test_igw.gateway_id }}"
+      tags:
+        Name: test-ansible-public-rt
+        env: test
+
+
+## creating the Private Routing table  ##
+
+- name: Creating the private routing table
+  ec2_vpc_route_table:
+      vpc_id: "{{ vpc_create.vpc.id }}"
+      region: us-east-1
+      subnets:
+         - "{{ vpc_private_subnet_1a.subnet.id }}"
+         - "{{ vpc_private_subnet_1b.subnet.id }}"
+      tags:
+        Name: test-ansible-private-rt
+        env: test
+
+
+
+
+
+
+
+
+
+
+
